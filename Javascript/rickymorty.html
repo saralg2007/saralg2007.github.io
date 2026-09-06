@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: rgb(196, 190, 255);
+        }
+        .respuesta {
+            color: white
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Rick y Morty</h1>
+    <input type="button" id="boton" value="Dame">
+    <br>
+    <h1 id="respuesta" style="color: white"></h1>
+    <div id="resultado">
+        <img src="" id="imagen" >
+     </div>
+     
+    <script>
+        let boton = document.getElementById("boton")
+        let url="https://rickandmortyapi.com/api/character/?gender=female"
+        let imagen = document.getElementById("imagen")
+        let respuesta = document.getElementById("respuesta")
+
+        // devuelve un valor aleatorio entre min y max
+        function numeroAleatorio(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        boton.addEventListener("click",(e) => {
+            nAnterior=-1
+            n=numeroAleatorio(0,19)
+            
+
+            fetch(url)
+            .then(response => response.json())
+            .then (data => {
+                if (n == nAnterior) {
+                    while (n == nAnterior) {
+                        n=numeroAleatorio(1,19)
+                    }
+                }
+                
+                respuesta.innerHTML = data.results[n].name
+                imagen.src=data.results[n].image       
+            })
+            .catch (error => console.log("ERROR: " + error + n))         
+            console.log("Me han pulsado" + n)
+            nAnterior=n
+        }) 
+
+    </script>
+</body>
+</html>

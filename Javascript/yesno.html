@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: rgb(196, 190, 255);
+        }
+        .respuesta {
+            color: white
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Yes or No</h1>
+    <input type="button" id="boton" value="Ask">
+    <input type="text" id="pregunta">
+    <br>
+    <h1 id="respuesta" style="color: white"></h1>
+    <div id="resultado">
+        <img src="" id="gif" >
+     </div>
+     
+    <script>
+        let boton = document.getElementById("boton")
+        let pregunta = document.getElementById("pregunta")
+        let url="https://yesno.wtf/api"
+        let gif = document.getElementById("gif")
+        let respuesta = document.getElementById("respuesta")
+
+        boton.addEventListener("click",(e) => {
+            
+            console.log("Me han pulsado")
+
+            fetch(url)
+            .then(response => response.json())
+            .then (data => {
+                respuesta.innerHTML = data.answer.toUpperCase()
+                gif.src=data.image
+                if (data.answer == "no") {
+                    respuesta.style.color = "red"
+                }
+                else {
+                    respuesta.style.color = "green"
+                }
+                
+            })
+            .catch (error => console.log("ERROR: " + error))         
+            
+        }) 
+    </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revista Digital - Diseño con Flexbox</title>
+    <link rel="stylesheet" href="css/ej2.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Barra de Navegación -->
+        <header>
+            <div class="logo">EL DIARIO FLEX</div>
+        </header>
+
+        <main>
+            <!-- Sección Hero (Noticia Principal) -->
+            <article class="principal">
+                <div class="principal-image">
+                    <img src="images/programador.jpg" alt="programador">
+                </div>
+                <div class="principal-noticia">
+                    <span class="exclusiva">Exclusiva</span>
+                    <h2>El fin de los `floats` en el diseño web moderno</h2>
+                    <p>
+                        Durante años, los desarrolladores lucharon contra los elementos flotantes y el temido "clearfix". Hoy, gracias a las bondades de CSS Flexbox y Grid, crear layouts complejos es cuestión de unas pocas líneas de código. Descubre cómo esta tecnología ha revolucionado la maquetación.
+                    </p>
+                    <a href="#" class="read-more">Leer más &rarr;</a>
+                </div>
+            </article>
+
+            <section class="news">
+                
+                <article class="card">
+                    <div class="card-image">
+                        <img src="images/meme-backend.jpg" alt="Meme Backend">
+                    </div>
+                    <div class="card-content">
+                        <h3>Front-end vs Back-end: El meme interminable</h3>
+                        <p>Analizamos por qué los memes sobre las diferencias entre el diseño visual y la arquitectura de servidores siguen siendo los favoritos en la comunidad de desarrolladores.</p>
+                        <a href="#" class="read-more">Leer más &rarr;</a>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card-image">
+                        <img src="images/servidor.jpg" alt="servidor">
+                    </div>
+                    <div class="card-content">
+                        <h3>Investigación: ¿Dónde está la copia de seguridad?</h3>
+                        <p>Una historia de terror digital. Cuando el servidor principal falla y descubres que el script de backups llevaba meses sin ejecutarse correctamente.</p>
+                        <a href="#" class="read-more">Leer más &rarr;</a>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="card-image">
+                        <img src="images/experto.jpg" alt="experto">
+                    </div>
+                    <div class="card-content">
+                        <h3>El nivel experto en Stack Overflow</h3>
+                        <p>¿Qué se necesita realmente para alcanzar el nivel de gurú en los foros de programación? Un repaso a las mejores respuestas pasivo-agresivas de la década.</p>
+                        <a href="#" class="read-more">Leer más &rarr;</a>
+                    </div>
+                </article>
+
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; El Diario Flex. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+</body>
+</html>

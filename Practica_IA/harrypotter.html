@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿A qué casa de Hogwarts perteneces?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a1a;
+            color: #e8d5b5;
+            font-family: 'Lora', serif;
+            overflow-x: hidden;
+        }
+
+        /* --- Fondo animado con estrellas --- */
+        .stars-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite alternate;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: var(--max-opacity); transform: scale(1.2); }
+        }
+
+        /* --- Partículas flotantes --- */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp var(--dur) ease-in infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(0) scale(0); }
+            20% { opacity: 0.7; }
+            100% { opacity: 0; transform: translateY(-300px) scale(1); }
+        }
+
+        /* --- Contenedor principal --- */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- Pantalla de inicio --- */
+        .screen {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Pantalla de inicio --- */
+        #start-screen {
+            text-align: center;
+        }
+
+        .hogwarts-crest {
+            font-size: 100px;
+            margin-bottom: 10px;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3)); }
+            to { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.7)); }
+        }
+
+        .main-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: #b8a080;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        .intro-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #c4b090;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .btn-start {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 18px 60px;
+            border: 2px solid #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+            color: #ffd700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-start::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-start:hover::before {
+            left: 100%;
+        }
+
+        .btn-start:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.1));
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), inset 0 0 30px rgba(255, 215, 0, 0.1);
+            transform: scale(1.05);
+        }
+
+        /* --- Barra de progreso --- */
+        .progress-container {
+            width: 100%;
+            margin-bottom: 35px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            color: #b8a080;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        /* --- Pregunta --- */
+        .question-card {
+            background: linear-gradient(145deg, rgba(30, 30, 60, 0.8), rgba(20, 20, 45, 0.9));
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 20px;
+            padding: 40px 35px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .question-number {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 0.85rem;
+            color: #ffd700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.1rem, 3vw, 1.35rem);
+            color: #f0e6d0;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            font-weight: 600;
+        }
+
+        /* --- Opciones --- */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            padding: 18px 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 14px;
+            color: #d4c4a8;
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 215, 0, 0.08);
+            border-color: rgba(255, 215, 0, 0.35);
+            color: #fff;
+            transform: translateX(8px);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.1);
+        }
+
+        .option-letter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #ffd700;
+            transition: all 0.35s ease;
+        }
+
+        .option-btn:hover .option-letter {
+            background: rgba(255, 215, 0, 0.25);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .option-btn.selected {
+            background: rgba(255, 215, 0, 0.12);
+            border-color: #ffd700;
+            color: #fff;
+        }
+
+        .option-btn.selected .option-letter {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        /* --- Pantalla de resultado --- */
+        #result-screen {
+            text-align: center;
+        }
+
+        .result-reveal {
+            animation: revealResult 1s ease;
+        }
+
+        @keyframes revealResult {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .result-house-icon {
+            font-size: 120px;
+            margin-bottom: 15px;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .result-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #b8a080;
+            margin-bottom: 10px;
+        }
+
+        .result-house-name {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px var(--house-glow);
+        }
+
+        .result-house-motto {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #b8a080;
+            margin-bottom: 30px;
+        }
+
+        .result-description {
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: #c4b090;
+            max-width: 550px;
+            margin: 0 auto 20px;
+        }
+
+        .result-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 35px;
+        }
+
+        .trait-tag {
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            border: 1px solid;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto 40px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px 10px;
+        }
+
+        .stat-house-name {
+            font-family: 'Cinzel', serif;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.7;
+        }
+
+        .stat-bar-bg {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 2px;
+            margin-bottom: 5px;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 1s ease 0.5s;
+        }
+
+        .stat-percent {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .btn-restart {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 15px 50px;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            background: transparent;
+            color: #ffd700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn-restart:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: #ffd700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+        }
+
+        /* --- Colores por casa --- */
+        .house-gryffindor { --house-color: #ae0001; --house-color2: #d3a625; --house-glow: rgba(174, 0, 1, 0.6); }
+        .house-slytherin { --house-color: #1a472a; --house-color2: #5d5d5d; --house-glow: rgba(26, 71, 42, 0.6); }
+        .house-ravenclaw { --house-color: #0e1a40; --house-color2: #946b2d; --house-glow: rgba(14, 26, 64, 0.6); }
+        .house-hufflepuff { --house-color: #ecb939; --house-color2: #372e29; --house-glow: rgba(236, 185, 57, 0.6); }
+
+        /* --- Responsive --- */
+        @media (max-width: 600px) {
+            .question-card { padding: 25px 20px; }
+            .option-btn { padding: 14px 18px; font-size: 0.95rem; }
+            .result-stats { grid-template-columns: repeat(2, 1fr); }
+            .hogwarts-crest { font-size: 70px; }
+        }
+
+        /* --- Transición entre preguntas --- */
+        .fade-out {
+            animation: fadeOut 0.3s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* --- Efecto de varita mágica en hover --- */
+        .option-btn::after {
+            content: '✦';
+            position: absolute;
+            right: 20px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .option-btn {
+            position: relative;
+        }
+
+        .option-btn:hover::after {
+            opacity: 1;
+            right: 25px;
+        }
+
+        /* Decoración */
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Estrellas de fondo -->
+<div class="stars-container" id="starsContainer"></div>
+
+<div class="main-container">
+
+    <!-- ====== PANTALLA DE INICIO ====== -->
+    <div class="screen active" id="start-screen">
+        <div class="hogwarts-crest">🏰</div>
+        <h1 class="main-title">El Sombrero Seleccionador</h1>
+        <p class="subtitle">«No importa lo que seas, sino lo que elijas ser»</p>
+        <p class="intro-text">
+            El Sombrero Seleccionador te ha sido colocado sobre la cabeza. 
+            Responde <strong>12 preguntas</strong> sobre el mundo mágico y descubre 
+            a cuál de las cuatro casas de Hogwarts perteneces realmente. 
+            <em>Recuerda: el Sombrero tiene en cuenta tus elecciones, no solo tus habilidades.</em>
+        </p>
+        <button class="btn-start" onclick="startQuiz()">
+            Comenzar la Selección
+        </button>
+    </div>
+
+    <!-- ====== PANTALLA DEL QUIZ ====== -->
+    <div class="screen" id="quiz-screen">
+        <div class="progress-container">
+            <div class="progress-info">
+                <span id="progress-text">Pregunta 1 de 12</span>
+                <span id="progress-percent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+        <div class="question-card" id="question-card">
+            <div class="question-number" id="question-number">Pregunta I</div>
+            <div class="question-text" id="question-text"></div>
+            <div class="options-grid" id="options-grid"></div>
+        </div>
+    </div>
+
+    <!-- ====== PANTALLA DE RESULTADO ====== -->
+    <div class="screen" id="result-screen">
+        <div class="result-reveal">
+            <div class="result-house-icon" id="result-icon"></div>
+            <div class="result-label">Tu casa es</div>
+            <div class="result-house-name" id="result-name"></div>
+            <div class="divider"></div>
+            <div class="result-house-motto" id="result-motto"></div>
+            <p class="result-description" id="result-description"></p>
+            <div class="result-traits" id="result-traits"></div>
+            <div class="result-stats" id="result-stats"></div>
+            <button class="btn-restart" onclick="restartQuiz()">
+                🔄 Repetir el Test
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ====== DATOS DE LAS PREGUNTAS ======
+    const questions = [
+        {
+            question: "¿Qué cualidad valoras más en ti mismo/a?",
+            options: [
+                { text: "La valentía para enfrentar lo desconocido", house: "gryffindor" },
+                { text: "La ambición de alcanzar mis metas", house: "slytherin" },
+                { text: "La sabiduría y el deseo de aprender", house: "ravenclaw" },
+                { text: "La lealtad hacia mis seres queridos", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "Si pudieras tener una mascota mágica, ¿cuál elegirías?",
+            options: [
+                { text: "Un león, símbolo de coraje y fuerza", house: "gryffindor" },
+                { text: "Una serpiente, elegante y astuta", house: "slytherin" },
+                { text: "Un águila, libre y observadora", house: "ravenclaw" },
+                { text: "Un tejón, trabajador y noble", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "¿Qué asignatura de Hogwarts te atraería más?",
+            options: [
+                { text: "Defensa Contra las Artes Oscuras", house: "gryffindor" },
+                { text: "Pociones, por su poder y sutileza", house: "slytherin" },
+                { text: "Encantamientos y su complejidad mágica", house: "ravenclaw" },
+                { text: "Herbología, conectar con la naturaleza", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "Encuentras un cofre mágico cerrado. ¿Qué haces?",
+            options: [
+                { text: "Lo abro sin dudarlo, hay que ser valiente", house: "gryffindor" },
+                { text: "Analizo quién lo puso ahí y para qué", house: "slytherin" },
+                { text: "Estudio los encantamientos que lo protegen", house: "ravenclaw" },
+                { text: "Busco ayuda para abrirlo de forma segura", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "¿Cuál sería tu patronus ideal?",
+            options: [
+                { text: "Un fénix: renacimiento y valentía eterna", house: "gryffindor" },
+                { text: "Un dragón: poder y respeto absoluto", house: "slytherin" },
+                { text: "Un búho: sabiduría y conocimiento", house: "ravenclaw" },
+                { text: "Un perro: lealtad y compañerismo", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "En un duelo mágico, ¿cuál es tu estrategia?",
+            options: [
+                { text: "Atacar de frente con hechizos poderosos", house: "gryffindor" },
+                { text: "Usar la astucia y hechizos inesperados", house: "slytherin" },
+                { text: "Estudiar al rival y encontrar su debilidad", house: "ravenclaw" },
+                { text: "Defender y esperar el momento justo", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "¿Qué objeto mágico te gustaría poseer?",
+            options: [
+                { text: "La Espada de Gryffindor", house: "gryffindor" },
+                { text: "El Guardapelos de Salazar Slytherin", house: "slytherin" },
+                { text: "La Corona de Rowena Ravenclaw", house: "ravenclaw" },
+                { text: "La Copa de Helga Hufflepuff", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "¿Cómo describirías tu lugar ideal para estudiar?",
+            options: [
+                { text: "Una sala llena de acción y debate", house: "gryffindor" },
+                { text: "Un lugar exclusivo, solo para los mejores", house: "slytherin" },
+                { text: "Una torre silenciosa llena de libros antiguos", house: "ravenclaw" },
+                { text: "Un jardín tranquilo rodeado de plantas mágicas", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "Si el Sombrero Seleccionador dudara, ¿qué le dirías?",
+            options: [
+                { text: "¡No me importa dónde me pongas, voy a ser el mejor!", house: "gryffindor" },
+                { text: "Sé a dónde pertenezco, y no es donde todos creen", house: "slytherin" },
+                { text: "Me gustaría estar donde pueda aprender más", house: "ravenclaw" },
+                { text: "Donde estén mis amigos, allí iré yo también", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "¿Qué harías si descubrieras que un amigo hizo trampa en un examen?",
+            options: [
+                { text: "Lo confrontaría directamente, la verdad ante todo", house: "gryffindor" },
+                { text: "Lo usaría como ventaja para negociar algo a cambio", house: "slytherin" },
+                { text: "Reflexionaría sobre por qué lo hizo y las consecuencias", house: "ravenclaw" },
+                { text: "Trataría de entenderlo y ayudarle a hacerlo bien la próxima vez", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "¿Cuál de estas frases te representa mejor?",
+            options: [
+                { text: "«La grandeza inspira grandeza»", house: "gryffindor" },
+                { text: "«El fin justifica los medios»", house: "slytherin" },
+                { text: "«El conocimiento es el mayor poder»", house: "ravenclaw" },
+                { text: "«La felicidad se encuentra en la amistad y el trabajo honesto»", house: "hufflepuff" }
+            ]
+        },
+        {
+            question: "Al final del año escolar, ¿qué logro te enorgullecería más?",
+            options: [
+                { text: "Haber defendido a alguien que lo necesitaba", house: "gryffindor" },
+                { text: "Haber conseguido el primer puesto en las calificaciones", house: "slytherin" },
+                { text: "Haber descubierto algo que nadie sabía", house: "ravenclaw" },
+                { text: "Haber ayudado a que todos en mi grupo mejoraran", house: "hufflepuff" }
+            ]
+        }
+    ];
+
+    // ====== DATOS DE LAS CASAS ======
+    const houses = {
+        gryffindor: {
+            name: "Gryffindor",
+            icon: "🦁",
+            color: "#ae0001",
+            color2: "#d3a625",
+            motto: "«Donde habitan los valientes de corazón»",
+            description: "El Sombrero ha visto en ti un espíritu indomable. Eres valiente, decidido/a y tienes un fuerte sentido de la justicia. No temes alzar la voz cuando algo es injusto y siempre estás dispuesto/a a luchar por lo que consideras correcto. Tu coraje no es la ausencia de miedo, sino la capacidad de actuar a pesar de él.",
+            traits: ["Valentía", "Determinación", "Nobleza", "Coraje"],
+            cssClass: "house-gryffindor"
+        },
+        slytherin: {
+            name: "Slytherin",
+            icon: "🐍",
+            color: "#1a472a",
+            color2: "#5d5d5d",
+            motto: "«Los ambiciosos y astutos encontrarán su camino»",
+            description: "Tu mente es tu mayor arma. El Sombrero ha detectado en ti una ambición feroz y una inteligencia estratégica que te llevará lejos. Eres ingenioso/a, resourceful y sabes cuándo actuar con cautela. No sigues las reglas ciegamente: las reinterpretas para alcanzar tus objetivos. Grandeza es tu destino.",
+            traits: ["Ambición", "Astucia", "Liderazgo", "Determinación"],
+            cssClass: "house-slytherin"
+        },
+        ravenclaw: {
+            name: "Ravenclaw",
+            icon: "🦅",
+            color: "#0e1a40",
+            color2: "#946b2d",
+            motto: "«La inteligencia es el mayor tesoro»",
+            description: "Tu mente es un laberinto brillante y curioso. El Sombrero ha visto en ti un amor profundo por el conocimiento, la creatividad y la originalidad. Valoras la sabiduría por encima de todo y encuentras belleza en lo que otros ignoran. Tu pensamiento único y tu perspectiva fresca te convierten en alguien extraordinario.",
+            traits: ["Sabiduría", "Creatividad", "Curiosidad", "Ingenio"],
+            cssClass: "house-ravenclaw"
+        },
+        hufflepuff: {
+            name: "Hufflepuff",
+            icon: "🦡",
+            color: "#ecb939",
+            color2: "#372e29",
+            motto: "«Lealtad, paciencia y trabajo duro»",
+            description: "El Sombrero ha descubierto en ti un corazón de oro. Eres leal, trabajador/a y posees un sentido innato de la justicia y la empatía. Valoras la amistad por encima de la gloria y tu fuerza reside en tu constancia y bondad. No necesitas buscar la fama: tu presencia ilumina a todos los que te rodean.",
+            traits: ["Lealtad", "Paciencia", "Trabajo duro", "Bondad"],
+            cssClass: "house-hufflepuff"
+        }
+    };
+
+    // ====== ESTADO DEL QUIZ ======
+    let currentQuestion = 0;
+    let scores = { gryffindor: 0, slytherin: 0, ravenclaw: 0, hufflepuff: 0 };
+
+    // ====== GENERAR ESTRELLAS ======
+    function createStars() {
+        const container = document.getElementById('starsContainer');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--dur', (2 + Math.random() * 4) + 's');
+            star.style.setProperty('--max-opacity', (0.3 + Math.random() * 0.7));
+            star.style.animationDelay = Math.random() * 5 + 's';
+            star.style.width = star.style.height = (1 + Math.random() * 2) + 'px';
+            container.appendChild(star);
+        }
+    }
+
+    // ====== FUNCIONES DEL QUIZ ======
+    function startQuiz() {
+        currentQuestion = 0;
+        scores = { gryffindor: 0, slytherin: 0, ravenclaw: 0, hufflepuff: 0 };
+        showScreen('quiz-screen');
+        loadQuestion();
+    }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function loadQuestion() {
+        const q = questions[currentQuestion];
+        const total = questions.length;
+        const percent = Math.round((currentQuestion / total) * 100);
+
+        // Actualizar progreso
+        document.getElementById('progress-text').textContent = `Pregunta ${currentQuestion + 1} de ${total}`;
+        document.getElementById('progress-percent').textContent = `${percent}%`;
+        document.getElementById('progress-fill').style.width = `${percent}%`;
+
+        // Número romano
+        const roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+        document.getElementById('question-number').textContent = `Pregunta ${roman[currentQuestion]}`;
+
+        // Pregunta
+        document.getElementById('question-text').textContent = q.question;
+
+        // Opciones
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+        const letters = ['A', 'B', 'C', 'D'];
+
+        // Mezclar opciones
+        const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt.text}</span>`;
+            btn.addEventListener('click', () => selectOption(btn, opt.house));
+            grid.appendChild(btn);
+        });
+
+        // Animar entrada
+        const card = document.getElementById('question-card');
+        card.style.animation = 'none';
+        card.offsetHeight; // reflow
+        card.style.animation = 'fadeIn 0.5s ease';
+    }
+
+    function selectOption(btn, house) {
+        // Marcar selección
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        // Sumar punto
+        scores[house]++;
+
+        // Siguiente pregunta tras breve pausa
+        setTimeout(() => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                const card = document.getElementById('question-card');
+                card.classList.add('fade-out');
+                setTimeout(() => {
+                    card.classList.remove('fade-out');
+                    loadQuestion();
+                }, 300);
+            } else {
+                showResult();
+            }
+        }, 500);
+    }
+
+    function showResult() {
+        // Determinar casa ganadora
+        let maxScore = 0;
+        let winner = 'gryffindor';
+        for (const [house, score] of Object.entries(scores)) {
+            if (score > maxScore) {
+                maxScore = score;
+                winner = house;
+            }
+        }
+
+        const h = houses[winner];
+        const total = questions.length;
+
+        // Aplicar colores
+        document.getElementById('result-screen').className = `screen active ${h.cssClass}`;
+
+        // Icono
+        document.getElementById('result-icon').textContent = h.icon;
+
+        // Nombre
+        const nameEl = document.getElementById('result-name');
+        nameEl.textContent = h.name;
+        nameEl.style.color = h.color2;
+
+        // Lema
+        document.getElementById('result-motto').textContent = h.motto;
+
+        // Descripción
+        document.getElementById('result-description').textContent = h.description;
+
+        // Traits
+        const traitsContainer = document.getElementById('result-traits');
+        traitsContainer.innerHTML = '';
+        h.traits.forEach(t => {
+            const tag = document.createElement('span');
+            tag.className = 'trait-tag';
+            tag.textContent = t;
+            tag.style.borderColor = h.color2;
+            tag.style.color = h.color2;
+            tag.style.background = `${h.color}22`;
+            traitsContainer.appendChild(tag);
+        });
+
+        // Estadísticas
+        const statsContainer = document.getElementById('result-stats');
+        statsContainer.innerHTML = '';
+        for (const [houseKey, score] of Object.entries(scores)) {
+            const hh = houses[houseKey];
+            const percent = Math.round((score / total) * 100);
+            const box = document.createElement('div');
+            box.className = 'stat-box';
+            box.innerHTML = `
+                <div class="stat-house-name" style="color: ${hh.color2}">${hh.name}</div>
+                <div class="stat-bar-bg">
+                    <div class="stat-bar-fill" style="width: ${percent}%; background: ${hh.color2};"></div>
+                </div>
+                <div class="stat-percent" style="color: ${hh.color2}">${percent}%</div>
+            `;
+            statsContainer.appendChild(box);
+        }
+
+        showScreen('result-screen');
+
+        // Scroll arriba
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function restartQuiz() {
+        currentQuestion = 0;
+        scores = { gryffindor: 0, slytherin: 0, ravenclaw: 0, hufflepuff: 0 };
+        document.getElementById('result-screen').className = 'screen';
+        showScreen('start-screen');
+    }
+
+    // ====== INICIALIZACIÓN ======
+    createStars();
+</script>
+
+</body>
+</html>

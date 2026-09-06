@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Contraseñas Seguras</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --accent-color: #4CAF50;
+            --accent-hover: #45a049;
+            --secondary-color: #2196F3;
+            --secondary-hover: #0b7dda;
+            --danger-color: #ff6b6b;
+            --success-bg: #e8f5e9;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        html.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #444444;
+            --success-bg: #1b3a1b;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-secondary);
+            padding: 10px 15px;
+            border-radius: 50px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+            opacity: 0.9;
+        }
+
+        .theme-toggle input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .toggle-icon {
+            font-size: 1.5em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .form-card {
+            background: var(--bg-primary);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-card:hover {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1em;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) calc(var(--value) * 100%), var(--border-color) calc(var(--value) * 100%), var(--border-color) 100%);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 10px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .range-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        #rangeValue {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .resultado-section {
+            background: var(--success-bg);
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+            display: none;
+        }
+
+        .resultado-section.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .resultado-section h3 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        #passwordOutput {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            word-break: break-all;
+            background: var(--bg-primary);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            letter-spacing: 1px;
+            user-select: all;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-copy {
+            flex: 1;
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-copy:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-add-history {
+            flex: 1;
+            background: var(--accent-color);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-history:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .history-card {
+            background: var(--bg-primary);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+
+        .history-card h2 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: var(--bg-secondary);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-item:hover {
+            background: var(--border-color);
+        }
+
+        .history-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .history-item-domain {
+            font-weight: 600;
+            color: var(--accent-color);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .history-item-password {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        .history-item-date {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .history-item-buttons {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .btn-copy-history,
+        .btn-delete-history {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-copy-history {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-copy-history:hover {
+            background: var(--secondary-hover);
+        }
+
+        .btn-delete-history {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-delete-history:hover {
+            background: #ff5252;
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+        }
+
+        .empty-history-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .btn-clear-history {
+            width: 100%;
+            background: var(--danger-color);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .btn-clear-history:hover {
+            background: #ff5252;
+        }
+
+        .btn-clear-history.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .history-item-buttons {
+                width: 100%;
+            }
+
+            .btn-copy-history,
+            .btn-delete-history {
+                flex: 1;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Generador de Contraseñas</h1>
+            <div class="theme-toggle">
+                <input type="checkbox" id="themeToggle">
+                <label for="themeToggle" class="toggle-label">
+                    <span class="toggle-icon" id="themeIcon">🌙</span>
+                    <span id="themeText">Tema Oscuro</span>
+                </label>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Formulario y Resultado -->
+            <div>
+                <div class="form-card">
+                    <form id="formulario">
+                        <div class="form-group">
+                            <label for="dominio">📧 Dominio o Servicio</label>
+                            <input type="text" id="dominio" name="dominio" placeholder="Ej: gmail.com, facebook.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="palabra">🔑 Palabra Maestra</label>
+                            <input type="password" id="palabra" name="palabra" placeholder="Tu palabra secreta" required>
+                            <small style="color: var(--text-secondary); margin-top: 5px; display: block;">
+                                ℹ️ Misma palabra = Misma contraseña
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="longitud">
+                                📏 Longitud: <span id="rangeValue">32</span> caracteres
+                            </label>
+                            <input type="range" id="longitud" name="longitud" min="8" max="64" value="32" step="1">
+                            <div class="range-info">
+                                <span>8</span>
+                                <span>64</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">✨ Generar Contraseña</button>
+                    </form>
+
+                    <div id="resultado" class="resultado-section">
+                        <h3>✅ Contraseña Generada</h3>
+                        <div id="passwordOutput"></div>
+                        <div class="button-group">
+                            <button class="btn-copy" id="copiarBtn">📋 Copiar</button>
+                            <button class="btn-add-history" id="addHistoryBtn">➕ Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial -->
+            <div class="history-card">
+                <h2>📜 Historial <span id="historyCount" style="font-size: 0.8em; color: var(--text-secondary);">(0)</span></h2>
+                <div class="history-list" id="historyList">
+                    <div class="empty-history">
+                        <div class="empty-history-icon">📋</div>
+                        <p>No hay contraseñas guardadas aún</p>
+                        <small>Las contraseñas que guardes aparecerán aquí</small>
+                    </div>
+                </div>
+                <button class="btn-clear-history" id="clearHistoryBtn">🗑️ Limpiar Historial</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables de estado
+        let historialContraseñas = [];
+
+        // Cargar historial del localStorage
+        function cargarHistorial() {
+            const historialGuardado = localStorage.getItem('historialContraseñas');
+            if (historialGuardado) {
+                historialContraseñas = JSON.parse(historialGuardado);
+                mostrarHistorial();
+            }
+        }
+
+        // Guardar historial en localStorage
+        function guardarHistorial() {
+            localStorage.setItem('historialContraseñas', JSON.stringify(historialContraseñas));
+        }
+
+        // Cargar tema del localStorage
+        function cargarTema() {
+            const temaGuardado = localStorage.getItem('tema');
+            if (temaGuardado === 'oscuro') {
+                document.documentElement.classList.add('dark-mode');
+                document.getElementById('themeToggle').checked = true;
+                actualizarTextoTema();
+            }
+        }
+
+        // Actualizar texto del tema
+        function actualizarTextoTema() {
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            document.getElementById('themeIcon').textContent = isDarkMode ? '☀️' : '🌙';
+            document.getElementById('themeText').textContent = isDarkMode ? 'Tema Claro' : 'Tema Oscuro';
+        }
+
+        // Toggle de tema
+        document.getElementById('themeToggle').addEventListener('change', () => {
+            document.documentElement.classList.toggle('dark-mode');
+            const isDarkMode = document.documentElement.classList.contains('dark-mode');
+            localStorage.setItem('tema', isDarkMode ? 'oscuro' : 'claro');
+            actualizarTextoTema();
+        });
+
+        // Generar contraseña
+        async function generarContraseña(dominio, palabra, longitud) {
+            const entrada = dominio + palabra;
+            const encoder = new TextEncoder();
+            const datos = encoder.encode(entrada);
+            const salt = encoder.encode(dominio);
+
+            const clave = await crypto.subtle.importKey(
+                'raw',
+                datos,
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits']
+            );
+
+            const bitsNeeded = Math.ceil(longitud * 8);
+
+            const bits = await crypto.subtle.deriveBits(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                clave,
+                bitsNeeded
+            );
+
+            const bytesArray = new Uint8Array(bits);
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*-_=+';
+            let contraseña = '';
+
+            for (let i = 0; i < longitud; i++) {
+                const indice = bytesArray[i % bytesArray.length] % caracteres.length;
+                contraseña += caracteres[indice];
+            }
+
+            return contraseña;
+        }
+
+        // Evento del formulario
+        document.getElementById('formulario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const dominio = document.getElementById('dominio').value.trim();
+            const palabra = document.getElementById('palabra').value.trim();
+            const longitud = parseInt(document.getElementById('longitud').value);
+
+            if (!dominio || !palabra) {
+                alert('Por favor completa ambos campos');
+                return;
+            }
+
+            const contraseña = await generarContraseña(dominio, palabra, longitud);
+
+            document.getElementById('passwordOutput').textContent = contraseña;
+            document.getElementById('resultado').classList.add('show');
+        });
+
+        // Cambiar longitud
+        document.getElementById('longitud').addEventListener('input', (e) => {
+            document.getElementById('rangeValue').textContent = e.target.value;
+            const percent = (e.target.value - 8) / (64 - 8) * 100;
+            e.target.style.setProperty('--value', percent / 100);
+        });
+
+        // Copiar contraseña
+        document.getElementById('copiarBtn').addEventListener('click', () => {
+            const contraseña = document.getElementById('passwordOutput').textContent;
+            navigator.clipboard.writeText(contraseña).then(() => {
+                const btn = document.getElementById('copiarBtn');
+                const textoOriginal = btn.textContent;
+                btn.textContent = '✅ ¡Copiada!';
+                setTimeout(() => {
+                    btn.textContent = textoOriginal;
+                }, 2000);
+            });
+        });
+
+        // Guardar en historial
+        document.getElementById('addHistoryBtn').addEventListener('click', () => {
+            const dominio = document.getElementById('dominio').value.trim();
+            const contraseña = document.getElementById('passwordOutput').textContent;
+
+            const item = {
+                id: Date.now(),
+                dominio: dominio,
+                contraseña: contraseña,
+                fecha: new Date().toLocaleString('es-ES')
+            };
+
+            historialContraseñas.unshift(item);
+            guardarHistorial();
+            mostrarHistorial();
+
+            const btn = document.getElementById('addHistoryBtn');
+            const textoOriginal = btn.textContent;
+            btn.textContent = '💾 ¡Guardada!';
+            setTimeout(() => {
+                btn.textContent = textoOriginal;
+            }, 2000);
+        });
+
+        // Mostrar historial
+        function mostrarHistorial() {
+            const historyList = document.getElementById('historyList');
+            const historyCount = document.getElementById('historyCount');
+            const clearBtn = document.getElementById('clearHistoryBtn');
+
+            historyCount.textContent = `(${historialContraseñas.length})`;
+
+            if (historialContraseñas.length === 0) {
+                historyList.innerHTML = `
+                    <div class="empty-history">
+                        <div class="empty-history-icon">📋</div>
+                        <p>No hay contraseñas guardadas aún</p>
+                        <small>Las contraseñas que guardes aparecerán aquí</small>
+                    </div>
+                `;
+                clearBtn.classList.remove('show');
+            } else {
+                historyList.innerHTML = historialContraseñas.map(item => `
+                    <div class="history-item">
+                        <div class="history-item-content">
+                            <div class="history-item-domain">🌐 ${item.dominio}</div>
+                            <div class="history-item-password">${item.contraseña}</div>
+                            <div class="history-item-date">📅 ${item.fecha}</div>
+                        </div>
+                        <div class="history-item-buttons">
+                            <button class="btn-copy-history" onclick="copiarDelHistorial('${item.contraseña}')">Copiar</button>
+                            <button class="btn-delete-history" onclick="eliminarDelHistorial(${item.id})">Borrar</button>
+                        </div>
+                    </div>
+                `).join('');
+                clearBtn.classList.add('show');
+            }
+        }
+
+        // Copiar del historial
+        function copiarDelHistorial(contraseña) {
+            navigator.clipboard.writeText(contraseña).then(() => {
+                alert('✅ ¡Copiada!');
+            });
+        }
+
+        // Eliminar del historial
+        function eliminarDelHistorial(id) {
+            historialContraseñas = historialContraseñas.filter(item => item.id !== id);
+            guardarHistorial();
+            mostrarHistorial();
+        }
+
+        // Limpiar historial
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            if (confirm('¿Estás seguro de que quieres limpiar todo el historial?')) {
+                historialContraseñas = [];
+                guardarHistorial();
+                mostrarHistorial();
+            }
+        });
+
+        // Inicializar
+        cargarTema();
+        cargarHistorial();
+    </script>
+</body>
+</html>
