@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?> -->
+
+<alumnos> 
+    <alumno nombre="Pepe"> 
+        Este alumno se duerme en clase
+        edad &lt; 18 &aacute; &nbsp;
+        <dni>12345678</dni>
+        <soltero/>
+    </alumno>
+
+</alumnos>

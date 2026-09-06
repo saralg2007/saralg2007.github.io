@@ -1,0 +1,73 @@
+<html lang="es">
+
+    <head>
+        <title> Formulario </title>
+    </head>
+
+    <body>
+        <h1 align="center"> FORMULARIO</h1>
+        <table align="center" width="100%">
+            <tr valign="top">
+                <td>
+                    <fieldset>
+                        <legend><b>Datos personales</b></legend>
+                        <form action="http://ncoge.com/phps/formulario.php" method="post">
+                        <br>Nombre: <input type="text" name="nombreUsuario" value="Tu nombre"> <br>
+                        <br>Apellidos: <input type="text" name="apellidoUsuario"> <br>
+                        <br>Correo: <input type="text" name="correoUsuario"> <br>
+                        <br> Hobbies: <textarea> </textarea> <br>
+                    </fieldset>
+                </td>
+                <td width="40%">
+                    <fieldset>
+                        <legend><b>Idiomas</b></legend> 
+                        Nivel de idiomas<br/>
+                        <br><b>Inglés:</b> 1<input type="radio" name="Ingles" value="1"/> 
+                        2<input type="radio" name="Ingles" value="2"/> 
+                        3<input type="radio" name="Ingles" value="3"/> 
+                        4<input type="radio" name="Ingles" value="4"/> 
+                        5<input type="radio" name="Ingles" value="5"/><br>
+                        <br>
+                        <b>Francés:</b> 1<input type="radio" name="Frances" value="1"/> 
+                        2<input type="radio" name="Frances" value="2"/> 
+                        3<input type="radio" name="Frances" value="3"/> 
+                        4<input type="radio" name="Frances" value="4"/> 
+                        5<input type="radio" name="Frances" value="5"/> <br>
+                        <br>
+                        <b>Alemán:</b> 1<input type="radio" name="Aleman" value="1"/> 
+                        2<input type="radio" name="Aleman" value="2"/> 
+                        3<input type="radio" name="Aleman" value="3"/> 
+                        4<input type="radio" name="Aleman" value="4"/> 
+                        5<input type="radio" name="Aleman" value="5"/> 
+                    </fieldset>
+
+                    <fieldset>
+                        <legend><b>Domino los siguientes programas:</b></legend>
+                        <br>Writer <input name="programa" type="checkbox" value="writer"/> 
+                        Base <input name="programa" type="checkbox" value="calc"/> <br>
+                        Calc <input name="programa" type="checkbox" value="base"/> 
+                        Impress <input name="programa" type="checkbox" value="impress"/> 
+                        </fieldset>
+                    <fieldset>
+                        <legend><b>Trabajo on el siguiente sistema operativo:</b></legend>
+                        <br><select id="Programa" name="programa"> 
+                            <optgroup label="Sistemas Operativos"> 
+                                <option value="Windows">Windows</option>
+                                <option value="Linux">Linux</option>
+                                <option value="Mac">Mac</option>
+                            </optgroup> 
+                        </select>
+                    </fieldset>
+                </td>
+            </tr> 
+            <tr>
+                <td colspan="2" align="center">
+                    <br><br><input type="reset" name="limpiar" value="Borrar datos del formulario" />
+                    <br><br><input type="image" name="enviar" src="iconoenviar.png" height="30"/>
+                </td>
+            </tr>           
+       </table>
+        </form>
+    </body>
+
+</html>

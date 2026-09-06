@@ -1,0 +1,43 @@
+body{
+    background-image: url("../fondoperiodico.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: top center;
+    text-align: center;
+    font-family: "UnifrakturMaguntia", cursive;
+}
+
+
+
+h1{
+    background-color: black;
+    color: beige;
+    border-left-width: 10px;
+    border-left-style: solid;
+    border-left-color: #593A14;
+    text-align: left;
+}
+
+img{
+    border: 10px solid;
+    border-radius: 1000px;
+    box-shadow: 10px 5px 5px #A68263;
+    height: 700px;
+    width: 700px;
+    
+}
+
+ul{
+    list-style-type: none;
+}
+
+li {
+    display: inline;
+    border: 4px solid #593A14;
+
+}
+
+a {
+    color: #593723
+}
